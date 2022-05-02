@@ -1,5 +1,8 @@
 const express = require('express')
 const router = express.Router()
+const multer  = require('multer');
+const os = require('os')
+const upload = multer({ dest: os.tmpdir() });
 //require('express-ws')(router)
 router.get('/api/v1/info', (req, res) => {
     res.send({
@@ -16,6 +19,8 @@ router.patch('/api/v1/instance/:name', require('./routes/instance/{name}/patch')
 router.get('/api/v1/instance/:name/state', require('./routes/instance/{name}/state/get'))
 router.post('/api/v1/instance/:name/console', require('./routes/instance/{name}/console/post'))
 router.ws('/api/v1/instance/:name/console', require('./routes/instance/{name}/console/ws'))
+router.get('/api/v1/instance/:name/files', require('./routes/instance/{name}/files/get'))
+router.post('/api/v1/instance/:name/files', upload.single('file'), require('./routes/instance/{name}/files/post'))
 // network endpoints
 router.get('/api/v1/network', require('./routes/network/get'))
 router.get('/api/v1/network/:name', require('./routes/network/{name}/get'))

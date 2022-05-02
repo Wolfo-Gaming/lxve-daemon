@@ -1,0 +1,6 @@
+--2022-05-02 14:04:39--  https://pipelines.actions.githubusercontent.com/serviceHosts/c6fe4915-ca24-46ff-aca2-54b9477ed7c3/_apis/pipelines/1/runs/927/signedartifactscontent?artifactName=snap
+Resolving pipelines.actions.githubusercontent.com (pipelines.actions.githubusercontent.com)... 13.107.42.16, 2620:1ec:21::16
+Connecting to pipelines.actions.githubusercontent.com (pipelines.actions.githubusercontent.com)|13.107.42.16|:443... connected.
+HTTP request sent, awaiting response... 400 Bad Request
+2022-05-02 14:04:39 ERROR 400: Bad Request.
+

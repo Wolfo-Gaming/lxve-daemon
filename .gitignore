@@ -3,3 +3,4 @@ node_modules/
 snap.zip
 lxd_5.0.0_amd64.snap
 test.js
+mount/*

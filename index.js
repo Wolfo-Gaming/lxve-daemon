@@ -29,9 +29,20 @@ app.use(express.urlencoded({
 }))
 module.exports.websockets = {
     array: [],
+    createVGA: (instance, vncport) => {
+        var access_token = makeToken(32)
+        module.exports.websockets.array.push({
+            type: "vga",
+            instance: instance,
+            access_token: access_token,
+            vncport
+        })
+        return access_token
+    },
     create: (instance, ws, control) => {
         var access_token = makeToken(32)
         module.exports.websockets.array.push({
+            type: "serial",
             instance: instance,
             access_token: access_token,
             websocket: ws,
@@ -47,6 +58,18 @@ module.exports.websockets = {
             }
             return ws.access_token != token
         })
+        return;
+    },
+    set_in_use: (token, value, type) => {
+        var arr = module.exports.websockets.array
+        var wanted_entry = arr.filter(a => a.token == token && a.type == type)[0]
+        wanted_entry.in_use = value
+        const index = arr.indexOf(wanted_entry);
+        if (index > -1) {
+            arr.splice(index, 1); // 2nd parameter means remove one item only
+        }
+        arr.push(wanted_entry)
+        module.exports.websockets.array = arr
         return;
     },
     get: (token) => {

@@ -1,12 +1,12 @@
 const { axios, extractAxiosError } = require('../../../../..')
-
+var os = require('os')
 /** @param {import('express').Request} req  @param {import('express').Response} res */
 module.exports = (req, res) => {
     axios.get("/1.0/instances/" + req.params.name + "/state").then(response => {
         var start_time = Date.now()
         var state = response.data
         if (state.metadata.status == "Running") {
-            var os = require('os')
+            
             axios.get('/1.0/instances/' + req.params.name).then(async response => {
                 var instance_cpulimit = response.data.metadata.config["limits.cpu"];
                 var host_cores = os.cpus().length;
@@ -69,20 +69,59 @@ module.exports = (req, res) => {
                 })
             })
         } else {
-            res.send({
-                state: state.metadata.status,
-                cpu: 0,
-                swap: {
-                    usage: 0
-                },
-                memory: {
-                    usage: 0,
-                    percent: 0
-                },
-                disk: {
-                    usage: state.metadata.disk ? state.metadata.disk.root ? state.metadata.disk.root.usage : 0 : 0
+            axios.get('/1.0/instances/' + req.params.name).then(async response => {
+                if (response.data.metadata.config["limits.memory"]) {
+                    var memory_limit = response.data.metadata.config["limits.memory"];
+                    var parsed_memory_unit = memory_limit.match(/[\d.\-\+]*\s*(.*)/)[1] || ''
+                    var parsed_memory_value = parseFloat(memory_limit, 10)
+                    switch (parsed_memory_unit) {
+                        case 'B':
+                            var memory_multiplier = 1
+                            break;
+                        case 'kB':
+                            var memory_multiplier = 1000
+                            break;
+                        case 'MB':
+                            var memory_multiplier = 1000000
+                            break;
+                        case 'GB':
+                            var memory_multiplier = 1000000000
+                            break;
+                        case 'TB':
+                            var memory_multiplier = 1000000000000
+                            break;
+                        default:
+                            var memory_multiplier = 1
+                            break;
+                    }
+                    var memory_bytes_limit = parsed_memory_value * memory_multiplier
+                } else {
+                    var memory_bytes_limit = os.totalmem()
                 }
+                res.send({
+                    state: state.metadata.status,
+                    cpu: {
+                        percent: 0,
+                        cores: 0,
+                    },
+                    swap: {
+                        usage: 0
+                    },
+                    memory: {
+                        limit: memory_bytes_limit,
+                        usage: 0,
+                        percent: 0
+                    },
+                    disk: {
+                        root: {
+                            usage: state.metadata.disk ? state.metadata.disk.root ? state.metadata.disk.root.usage : 0 : 0
+                        }
+     
+                    }
+                })
             })
+            
+            
         }
     })
 

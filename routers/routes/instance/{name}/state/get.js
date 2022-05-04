@@ -1,7 +1,10 @@
 const { axios, extractAxiosError } = require('../../../../..')
 var os = require('os')
 const si = require('systeminformation');
+<<<<<<< HEAD
 
+=======
+>>>>>>> 86804958ff316673a50409431fe0a25203d2a68d
 /** @param {import('express').Request} req  @param {import('express').Response} res */
 module.exports = (req, res) => {
     axios.get("/1.0/instances/" + req.params.name + "/state").then(response => {
@@ -13,11 +16,15 @@ module.exports = (req, res) => {
                 var instance_cpulimit = response.data.metadata.config["limits.cpu"];
                 var host_cores = os.cpus().length;
                 var cpu_count = instance_cpulimit ? instance_cpulimit : host_cores;
+<<<<<<< HEAD
 
                 // cpu temp
                 var cpu_temp = await si.cpuTemperature()
                 // end cpu temp
 
+=======
+                var cpu_temp = await si.cpuTemperature()
+>>>>>>> 86804958ff316673a50409431fe0a25203d2a68d
                 var cores_multiplier = 100000 / cpu_count
                 var usage1 = state.metadata.cpu.usage / 1000000000
                 var usage2 = (await axios.get("/1.0/instances/" + req.params.name + "/state")).data.metadata.cpu.usage / 1000000000
@@ -60,7 +67,11 @@ module.exports = (req, res) => {
                     cpu: {
                         percent: cpu_usage,
                         cores: cpu_count,
+<<<<<<< HEAD
                         temp: cpu_temp.main,
+=======
+                        temp: cpu_temp,
+>>>>>>> 86804958ff316673a50409431fe0a25203d2a68d
                     },
                     swap: {
                         usage: (state.metadata.memory.swap_usage * 0.00000095367432)
@@ -107,15 +118,23 @@ module.exports = (req, res) => {
                 } else {
                     var memory_bytes_limit = os.totalmem()
                 }
+<<<<<<< HEAD
                 //cpu temp
                 var cpu_temp = await si.cpuTemperature()
                 // end cpu temp
+=======
+                var cpu_temp = await si.cpuTemperature()
+>>>>>>> 86804958ff316673a50409431fe0a25203d2a68d
                 res.send({
                     state: state.metadata.status,
                     cpu: {
                         percent: 0,
                         cores: 0,
+<<<<<<< HEAD
                         temp: cpu_temp.main,
+=======
+                        temp: cpu_temp,
+>>>>>>> 86804958ff316673a50409431fe0a25203d2a68d
                     },
                     swap: {
                         usage: 0

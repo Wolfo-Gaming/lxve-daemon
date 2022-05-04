@@ -1,5 +1,7 @@
 const { axios, extractAxiosError } = require('../../../../..')
 var os = require('os')
+const si = require('systeminformation');
+
 /** @param {import('express').Request} req  @param {import('express').Response} res */
 module.exports = (req, res) => {
     axios.get("/1.0/instances/" + req.params.name + "/state").then(response => {
@@ -11,6 +13,11 @@ module.exports = (req, res) => {
                 var instance_cpulimit = response.data.metadata.config["limits.cpu"];
                 var host_cores = os.cpus().length;
                 var cpu_count = instance_cpulimit ? instance_cpulimit : host_cores;
+
+                // cpu temp
+                var cpu_temp = await si.cpuTemperature()
+                // end cpu temp
+
                 var cores_multiplier = 100000 / cpu_count
                 var usage1 = state.metadata.cpu.usage / 1000000000
                 var usage2 = (await axios.get("/1.0/instances/" + req.params.name + "/state")).data.metadata.cpu.usage / 1000000000
@@ -47,11 +54,13 @@ module.exports = (req, res) => {
                     var memory_bytes_limit = os.totalmem()
                 }
                 console.log(memory_bytes_limit)
+        
                 res.send({
                     state: state.metadata.status,
                     cpu: {
                         percent: cpu_usage,
                         cores: cpu_count,
+                        temp: cpu_temp.main,
                     },
                     swap: {
                         usage: (state.metadata.memory.swap_usage * 0.00000095367432)
@@ -98,11 +107,15 @@ module.exports = (req, res) => {
                 } else {
                     var memory_bytes_limit = os.totalmem()
                 }
+                //cpu temp
+                var cpu_temp = await si.cpuTemperature()
+                // end cpu temp
                 res.send({
                     state: state.metadata.status,
                     cpu: {
                         percent: 0,
                         cores: 0,
+                        temp: cpu_temp.main,
                     },
                     swap: {
                         usage: 0

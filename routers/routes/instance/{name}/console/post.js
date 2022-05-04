@@ -8,7 +8,7 @@ module.exports = (req, res) => {
             var data = response.data
             if (data.metadata.config['user.vncport']) {
                 var vncport = parseFloat(data.metadata.config['user.vncport'])
-                var access_token = websockets.createVGA(req.params.instance, vncport)
+                var access_token = websockets.createVGA(req.params.instance, vncport, req.body.access_token)
                 res.send({
                     socket_url: '/api/v1/instance/' + req.params.name + '/console',
                     access_token: access_token
@@ -45,7 +45,7 @@ module.exports = (req, res) => {
                 var control_path = data.operation + "/websocket?secret=" + data.metadata.metadata.fds["control"];
                 var console_socket = new ws.WebSocket("ws+unix:///var/snap/lxd/common/lxd/unix.socket:" + console_path);
                 var control_socket = new ws.WebSocket("ws+unix:///var/snap/lxd/common/lxd/unix.socket:" + control_path);
-                var access_token = websockets.create(req.params.name, console_socket, control_socket)
+                var access_token = websockets.create(req.params.name, console_socket, control_socket, req.body.access_token)
                 res.send({
                     socket_url: '/api/v1/instance/' + req.params.name + '/console',
                     access_token: access_token

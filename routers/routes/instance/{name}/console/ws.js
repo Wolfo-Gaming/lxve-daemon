@@ -28,12 +28,12 @@ module.exports = (ws, req) => {
             }
             ws.on('message', ws_listener)
             ws.on('close', () => {
-                websockets.revoke(token)
+                //websockets.revoke(token)
                 ws.removeEventListener("message", ws_listener)
                 console_socket.removeListener("message", console_socket_listener)
             })
             console_socket.on('close', () => {
-                websockets.revoke(token)
+                //websockets.revoke(token)
                 ws.removeEventListener("message", ws_listener)
                 console_socket.removeListener("message", console_socket_listener)
             })

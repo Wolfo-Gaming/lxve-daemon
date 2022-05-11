@@ -22,6 +22,7 @@ router.post('/api/v1/instance/:name/console', require('./routes/instance/{name}/
 router.ws('/api/v1/instance/:name/console', require('./routes/instance/{name}/console/ws'))
 router.get('/api/v1/instance/:name/files', require('./routes/instance/{name}/files/get'))
 router.post('/api/v1/instance/:name/files', upload.single('file'), require('./routes/instance/{name}/files/post'))
+router.get('/api/v1/instance/:name/files/type', require('./routes/instance/{name}/files/type/get'))
 // network endpoints
 router.get('/api/v1/network', require('./routes/network/get'))
 router.get('/api/v1/network/:name', require('./routes/network/{name}/get'))

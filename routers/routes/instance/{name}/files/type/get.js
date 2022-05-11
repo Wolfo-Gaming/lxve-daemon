@@ -1,9 +1,8 @@
-const { axios, extractAxiosError } = require('../../../../..')
-const { connect } = require('../../../../../lib/sftp')
+const { axios, extractAxiosError } = require('../../../../../..')
+const { connect } = require('../../../../../../lib/sftp')
 const fs = require('fs')
 const path = require('path')
-const { isText, isBinary, getEncoding } = require('istextorbinary')
-
+const { isText } = require('istextorbinary')
 /** @param {import('express').Request} req  @param {import('express').Response} res */
 module.exports = (req, res) => {
     axios.get('/1.0/instances/'+req.params.name).then(response => {
@@ -24,33 +23,12 @@ module.exports = (req, res) => {
                     "metadata": {}
                 })
                 if (fs.statSync(base_dir + req.query.path).isFile()) {
-                    res.download(base_dir + req.query.path, () => {
-                        result.child_process.kill()
-                    })
+                    var is_text = await isText(base_dir + req.query.path)
+                    res.send({type: "file",is_text})
+                    result.child_process.kill()
                 } else if (fs.statSync(base_dir + req.query.path).isDirectory()) {
-                    var filetype = await import('file-type')
-                    var s = await Promise.all(fs.readdirSync(base_dir + req.query.path).map(async item => {
-                        if (fs.statSync(base_dir + req.query.path + "/" + item).isFile()) {
-                            var is_text = await isText(base_dir + req.query.path + "/" + item)
-                            try {
-                                var stat = fs.statSync(base_dir + req.query.path + "/" + item)
-                            } catch (error) {
-                                var stat = {
-                                    atime: '1970-01-01T00:00:00.000Z',
-                                    mtime: '1970-01-01T00:00:00.000Z',
-                                    ctime: '1970-01-01T00:00:00.000Z',
-                                    birthtime: '1970-01-01T00:00:00.000Z',
-                                  }
-                            }
-                            return {...stat,istext: is_text, name: item, mime: await filetype.fileTypeFromFile(path.normalize(base_dir + req.query.path + "/" + item)) ? await filetype.fileTypeFromFile(path.normalize(base_dir + req.query.path + "/" + item)).mime : {mime:"text/plain"}, isFile: true}
-                         } else {
-                            return {...fs.statSync(base_dir + req.query.path + "/" + item),name: item, mime: {}, isFile: false}
-                         }
-                    }))
-                    res.send(s)
-                    setTimeout(() => {
-                        result.child_process.kill()
-                    }, 100)
+                    res.send({type: 'dir'})
+                    result.child_process.kill()
                 } else {
                     result.child_process.kill()
                     return res.status(400).send({

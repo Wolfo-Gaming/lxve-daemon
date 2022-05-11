@@ -16,6 +16,11 @@ module.exports = (ws, req) => {
         if (type == "serial") {
             /**@type {import('ws').WebSocket} */
             var console_socket = websockets.get(token).websocket
+            console.log(console_socket.readyState)
+            if (console_socket.readyState != 1) {
+                websockets.revoke(token)
+                return ws.close(1011, 'Websocket in invalid state.')
+            }
             //console.log(console_socket)
             var console_socket_listener = (data) => {
                 console.log(data)
